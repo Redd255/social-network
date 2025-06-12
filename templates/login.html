@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>Sign In</title>
+</head>
+<body>
+    <div class="auth-container">
+        <h1>Sign In</h1>
+        <form action="/login" method="POST">
+            {{ if .ErrorMessage }}
+            <div class="error-message">{{ .ErrorMessage }}</div>
+            {{ end }}
+            
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            </div>
+
+            <div class="form-group password-toggle">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="btn-submit">Sign In</button>
+            
+            <div class="auth-links">
+                Don't have an account? <a href="/register">Sign Up</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

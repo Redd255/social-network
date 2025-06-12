@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>{{.Group.Title}} - Group Page</title>
+    <link rel="stylesheet" href="/static/cc.css" />
+</head>
+
+<body>
+    <div class="group-page-container">
+        <!-- Back Navigation -->
+        <div class="back-nav">
+            <a href="/homepage" class="back-btn"> ← Back to Groups </a>
+        </div>
+
+        <!-- Group Header -->
+        <div class="group-header">
+            <h2>{{.Group.Title}}</h2>
+            <p class="group-description">{{.Group.Description}}</p>
+        </div>
+
+        {{if or .Group.IsCreator .Group.IsMember}}
+        <!-- Group Members Section -->
+        <div class="group-section">
+            <h3 class="section-title">Group Members</h3>
+            {{if .Members}}
+            <ul class="member-list">
+                {{range .Members}}
+                <li class="member-item">
+                    <div class="member-info">
+                        <div class="member-name">{{.Username}}</div>
+                        <div class="member-role">{{.Role}}</div>
+                    </div>
+                </li>
+                {{end}}
+            </ul>
+            {{else}}
+            <div class="empty-state">No members yet.</div>
+            {{end}}
+        </div>
+        {{else}}
+        <!-- No Access Message -->
+        <div class="no-access-message">
+            🔒 You are not a member of this group and cannot view its
+            details.
+        </div>
+        {{end}} {{if .IsAdmin}}
+        <!-- Join Requests Section -->
+        <div class="group-section">
+            <h3 class="section-title">Join Requests</h3>
+            {{if .RequestedMembers}}
+            <ul class="member-list">
+                {{range .RequestedMembers}}
+                <li class="request-item">
+                    <div class="request-info">
+                        <div class="request-username">{{.Username}}</div>
+                        <div class="request-status">{{.Status}}</div>
+                    </div>
+                    <div class="action-buttons">
+                        <form method="POST" action="/group/accept" style="display: inline">
+                            <input type="hidden" name="user_id" value="{{.UserID}}" />
+                            <input type="hidden" name="group_id" value="{{$.Group.ID}}" />
+                            <button type="submit" class="accept-btn">Accept</button>
+                        </form>
+                        <form method="POST" action="/group/reject" style="display: inline">
+                            <input type="hidden" name="user_id" value="{{.UserID}}" />
+                            <input type="hidden" name="group_id" value="{{$.Group.ID}}" />
+                            <button type="submit" class="reject-btn">Reject</button>
+                        </form>
+                    </div>
+                </li>
+                {{end}}
+            </ul>
+            {{else}}
+            <div class="empty-state">No pending join requests.</div>
+            {{end}}
+        </div>
+        {{end}}
+        {{if .IsAdmin}}
+        <!-- Invite Users Section -->
+        <div class="group-section">
+            <h3 class="section-title">Invite Users</h3>
+            {{if .InvitableUsers}}
+            <ul class="member-list">
+                {{range .InvitableUsers}}
+                <li class="invite-item">
+                    <div class="invite-username">{{.Username}}</div>
+                    <form method="POST" action="/group/invite" style="display: inline">
+                        <input type="hidden" name="user_id" value="{{.UserID}}" />
+                        <input type="hidden" name="group_id" value="{{$.Group.ID}}" />
+                        {{if .Invited}}
+                        <button type="button" class="invite-btn" disabled>Invited</button>
+                        {{else}}
+                        <button type="submit" class="invite-btn">Invite</button>
+                        {{end}}
+                    </form>
+                </li>
+                {{end}}
+            </ul>
+            {{else}}
+            <div class="empty-state">No users available for
+                invitation.</div>
+            {{end}}
+        </div>
+        {{end}} {{if or .Group.IsCreator .Group.IsMember}}
+        <!-- Create Event Form -->
+        <div class="group-section">
+            <h3 class="section-title">Create Event</h3>
+            <form method="POST" action="/group/create-event">
+                <input type="hidden" name="group_id" value="{{.Group.ID}}" />
+                <label>Title:</label>
+                <input type="text" name="title" required /><br />
+                <label>Description:</label>
+                <textarea name="description"></textarea><br />
+                <label>Date/Time:</label>
+                <input type="datetime-local" name="datetime" required /><br />
+                <button type="submit">Create Event</button>
+            </form>
+        </div>
+
+        <!-- List Events -->
+        <div class="group-section">
+            <h3 class="section-title">Group Events</h3>
+            {{if .Events}}
+            <ul class="event-list">
+                {{range .Events}}
+                <li class="event-item">
+                    <strong>{{.Title}}</strong> - {{.DateTime}}<br />
+                    <small>{{.Description}}</small><br />
+                    <form method="POST" action="/event/respond" style="display: inline">
+                        <input type="hidden" name="event_id" value="{{.ID}}" />
+                        <button name="response" value="going">✅
+                            Going</button>
+                        <button name="response" value="not_going">❌ Not
+                            Going</button>
+                    </form>
+                    {{if eq .UserResponse "going"}}
+                    <div style="color: green; margin-top: 5px">✅ You're
+                        going</div>
+                    {{else if eq .UserResponse "not_going"}}
+                    <div style="color: red; margin-top: 5px">❌ You're not
+                        going</div>
+                    {{end}}
+                </li>
+                {{end}}
+            </ul>
+            {{else}}
+            <div class="empty-state">No events yet.</div>
+            {{end}}
+        </div>
+        <!-- Group Posts Section -->
+        <div class="group-section">
+            <h3 class="section-title">Group Posts</h3>
+
+            <!-- Create Post -->
+            <form method="POST" action="/group/create-post">
+                <input type="hidden" name="group_id" value="{{.Group.ID}}" />
+                <textarea name="content" placeholder="Write something to the group..." required></textarea><br />
+                <button type="submit">Post</button>
+            </form>
+
+            <!-- List of Posts -->
+            {{if .Posts}}
+            <ul class="post-list">
+                {{range .Posts}}
+                <li class="post-item">
+                    <div class="post-header">
+                        <strong>{{.Username}}</strong>
+                        <small>{{.CreatedAt}}</small>
+                    </div>
+                    <p class="post-content">{{.Content}}</p>
+
+                    <!-- Comment Form -->
+                    <form method="POST" action="/group/create-comment">
+                        <input type="hidden" name="post_id" value="{{.ID}}" />
+                        <input type="hidden" name="group_id" value="{{$.Group.ID}}" />
+                        <input type="text" name="content" placeholder="Write a comment..." required />
+                        <button type="submit">Comment</button>
+                    </form>
+
+                    <!-- Comment List -->
+                    {{if .Comments}}
+                    <ul class="comment-list">
+                        {{range .Comments}}
+                        <li class="comment-item">
+                            <strong>{{.Username}}</strong>: {{.Content}}
+                            <small>{{.CreatedAt}}</small>
+                        </li>
+                        {{end}}
+                    </ul>
+                    {{else}}
+                    <div class="empty-state">No comments yet.</div>
+                    {{end}}
+                </li>
+                {{end}}
+            </ul>
+            {{else}}
+            <div class="empty-state">No posts yet.</div>
+            {{end}}
+        </div>
+
+        {{end}}
+    </div>
+</body>
+
+</html>
