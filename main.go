@@ -41,30 +41,25 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(staticDir))))
 
 	http.HandleFunc("/", login)
-	http.HandleFunc("/homepage", homepage)
-	http.HandleFunc("/register", register)
-	http.HandleFunc("/logout", logout)
-
-	http.HandleFunc("/group/", stati.GroupPageHandler)
-	http.HandleFunc("/create-group", stati.CreateGroupHandler)
-	http.HandleFunc("/join-group", stati.JoinGroupHandler)
+	http.HandleFunc("/register", register) // done
+	http.HandleFunc("/logout", logout) // done
+	
+	http.HandleFunc("/homepage", homepage) // done homepage
+	http.HandleFunc("/create-group", stati.CreateGroupHandler) // done
+	http.HandleFunc("/group/", stati.GroupPageHandler) // bach dkhel
+	http.HandleFunc("/join-group", stati.JoinGroupHandler) 
 	http.HandleFunc("/group/accept", stati.AcceptJoinRequestHandler)
 	http.HandleFunc("/group/reject", stati.RejectJoinRequestHandler)
 	http.HandleFunc("/group/invite", stati.GroupInviteHandler)
-
-	// Add accept-invite and reject-invite handlers here:
 	http.HandleFunc("/group/accept-invite", stati.AcceptInviteHandler)
 	http.HandleFunc("/group/reject-invite", stati.RejectInviteHandler)
-
-	// Event-related handlers
 	http.HandleFunc("/group/create-event", stati.CreateEventHandler)
 	http.HandleFunc("/event/respond", stati.EventResponseHandler)
-
 	http.HandleFunc("/group/create-post", stati.CreateGroupPostHandler)
 	http.HandleFunc("/group/create-comment", stati.CreateGroupCommentHandler)
 
-	fmt.Println("Server running at http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Println("Server running at http://localhost:8980")
+	log.Fatal(http.ListenAndServe(":8980", nil))
 }
 
 // register handles user registration
